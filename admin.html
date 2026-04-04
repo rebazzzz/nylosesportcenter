@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Nylöse SportCenter</title>
+    <meta name="description" content="Admininloggning för Nylöse SportCenter">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="styles/min/base.min.css">
+    <link rel="stylesheet" href="styles/min/admin.min.css">
+    <link rel="stylesheet" href="styles/min/responsivity.min.css">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" href="images/favicon-256.png">
+    <script src="js/min/admin.min.js" defer></script>
+</head>
+
+<body>
+    <section class="admin-login">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-brand">
+                    <img src="images/logo-nav.png" alt="Nylöse SportCenter logotyp" width="256" height="256">
+                    <span>Nylöse SportCenter</span>
+                </div>
+                <div class="login-header">
+                    <h1>Admin</h1>
+                    <p>Logga in för att se vilka som har anmält sig.</p>
+                </div>
+                <form id="admin-login-form" class="login-form">
+                    <div class="form-group">
+                        <label for="email">E-postadress</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Lösenord</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <div id="error-message" class="error-message"></div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Logga in
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

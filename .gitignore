@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.secret
+secrets/
+
+# Databases and local app data
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+backend/database/*.db
+backend/uploads/
+uploads/
+
+# Logs and reports
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+playwright-report/
+test-results/
+coverage/
+
+# Build and cache outputs
+dist/
+build/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.turbo/
+tmp/
+tmp-device-lab/
+temp/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.tmp
+.vscode/
+.idea/
+
+# Local notes
+TODO.md
+info.md

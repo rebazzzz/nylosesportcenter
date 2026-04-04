@@ -1,0 +1,7 @@
+.git
+.gitignore
+node_modules
+backend/node_modules
+backend/test
+images/*.psd
+npm-debug.log

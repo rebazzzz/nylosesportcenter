@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Nylöse SportCenter</title>
+    <meta name="description" content="Adminöversikt för registrerade medlemmar och kontaktmeddelanden hos Nylöse SportCenter">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="styles/min/base.min.css">
+    <link rel="stylesheet" href="styles/min/admin.min.css">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" href="images/favicon-256.png">
+</head>
+
+<body>
+    <header class="admin-frame-header">
+        <div class="container admin-frame-bar">
+            <div>
+                <p class="eyebrow">Nylöse SportCenter</p>
+                <h1>Adminöversikt</h1>
+            </div>
+            <button id="logout-btn" class="btn btn-primary" type="button">
+                <i class="fas fa-sign-out-alt"></i>
+                Logga ut
+            </button>
+        </div>
+    </header>
+
+    <section class="admin-dashboard-shell">
+        <div class="container">
+            <div class="dashboard-topbar">
+                <div>
+                    <p class="eyebrow">Administration</p>
+                    <h2>Medlemmar och kontaktmeddelanden</h2>
+                    <p id="dashboard-welcome" class="dashboard-subtitle">Laddar innehåll...</p>
+                </div>
+                <div class="topbar-actions">
+                    <button id="export-dashboard" class="btn btn-secondary" type="button">
+                        <i class="fas fa-file-export"></i>
+                        Exportera medlemmar
+                    </button>
+                    <button id="export-contacts" class="btn btn-secondary" type="button">
+                        <i class="fas fa-envelope-open-text"></i>
+                        Exportera meddelanden
+                    </button>
+                    <button id="refresh-dashboard" class="btn btn-secondary" type="button">
+                        <i class="fas fa-rotate-right"></i>
+                        Uppdatera
+                    </button>
+                </div>
+            </div>
+
+            <div id="summary-cards" class="stats-grid"></div>
+
+            <section class="panel-shell">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Registreringar</p>
+                        <h3>Alla som har anmält sig</h3>
+                    </div>
+                    <div class="panel-tools">
+                        <button id="toggle-members" class="btn btn-secondary collapse-btn" type="button"
+                            aria-expanded="false">
+                            Visa registreringar
+                        </button>
+                        <input id="members-search" class="toolbar-search" type="search"
+                            placeholder="Sök namn, e-post eller personnummer">
+                        <span id="members-count" class="muted-label">0 visade</span>
+                    </div>
+                </div>
+                <div id="members-panel" class="collapsible-panel is-collapsed">
+                    <div id="members-table" class="responsive-table"></div>
+                    <div id="members-cards" class="member-cards"></div>
+                </div>
+            </section>
+
+            <section class="panel-shell">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Kontakt</p>
+                        <h3>Meddelanden från kontaktsidan</h3>
+                    </div>
+                    <div class="panel-tools">
+                        <button id="toggle-contacts" class="btn btn-secondary collapse-btn" type="button"
+                            aria-expanded="false">
+                            Visa meddelanden
+                        </button>
+                        <input id="contacts-search" class="toolbar-search" type="search"
+                            placeholder="Sök namn, e-post eller meddelande">
+                        <span id="contacts-count" class="muted-label">0 visade</span>
+                    </div>
+                </div>
+                <div id="contacts-panel" class="collapsible-panel is-collapsed">
+                    <div id="contacts-table" class="responsive-table"></div>
+                    <div id="contacts-cards" class="member-cards"></div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <footer class="admin-frame-footer">
+        <div class="container">
+            <p>Intern adminpanel för Nylöse SportCenter</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <script src="js/min/admin-dashboard.min.js" defer></script>
+</body>
+
+</html>

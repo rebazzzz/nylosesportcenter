@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Om Nylöse SportCenter | Kampsport i Angered, Göteborg</title>
+    <meta name="description"
+        content="Läs om Nylöse SportCenter i Angered, Göteborg. En trygg klubb sedan 1944 för barn, ungdomar och vuxna som vill träna brottning, Wresfit eller Girls Only.">
+    <link rel="canonical" href="https://nylosesportcenter.se/nylose/about.html">
+    <meta property="og:locale" content="sv_SE">
+    <meta property="og:title" content="Om Nylöse SportCenter | Kampsport i Angered, Göteborg">
+    <meta property="og:description" content="En trygg klubb med tydlig träning, stark gemenskap och lokalt engagemang i Angered.">
+    <meta property="og:image" content="https://nylosesportcenter.se/nylose/images/logo.jpg">
+    <meta property="og:url" content="https://nylosesportcenter.se/nylose/about.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Nylöse SportCenter">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="styles/min/base.min.css">
+    <link rel="stylesheet" href="styles/min/about.min.css">
+    <link rel="stylesheet" href="styles/min/index.min.css">
+    <link rel="stylesheet" href="styles/min/responsivity.min.css">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" href="images/favicon-256.png">
+    <script src="js/min/generated-media.min.js" defer></script>
+    <script src="js/min/scripts.min.js" defer></script>
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="navbar" aria-label="Huvudnavigation">
+            <div class="container nav-container">
+                <a href="index.html" class="logo">
+                    <img src="images/logo-nav.png" alt="Nylöse SportCenter logotyp" width="256" height="256"
+                        decoding="async">
+                    <span>Nylöse SportCenter</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html" data-nav="index.html">Hem</a></li>
+                    <li><a href="index.html#sports">Sporter</a></li>
+                    <li><a href="registration.html" data-nav="registration.html">Registrering</a></li>
+                    <li><a href="index.html#schedule">Schema</a></li>
+                    <li><a href="about.html" data-nav="about.html">Om oss</a></li>
+                    <li><a href="contact.html" data-nav="contact.html">Kontakt</a></li>
+                </ul>
+                <button class="hamburger" onclick="toggleMenu()" aria-expanded="false" aria-label="Öppna navigation"
+                    type="button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </nav>
+        <div class="menu-overlay" onclick="closeMenu()"></div>
+    </header>
+
+    <main>
+        <section class="about-hero">
+            <div class="container about-hero-copy">
+                <p class="about-kicker">Om oss</p>
+                <h1>En klubb där fler känner sig välkomna</h1>
+                <p class="hero-intro">Nylöse SportCenter har funnits sedan 1944 och samlar barn, ungdomar och vuxna i
+                    en trygg miljö där respekt, disciplin och gemenskap går först.</p>
+            </div>
+        </section>
+
+        <section class="about-manifest">
+            <div class="container">
+                <div class="manifest-card">
+                    <p class="about-kicker">Vår klubb</p>
+                    <p class="manifest-text">Vi tror inte på att göra det krångligt. Bra ledare, tydliga pass och en
+                        miljö där det känns tryggt att komma in, börja träna och vilja fortsätta.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-values">
+            <div class="container">
+                <p class="about-kicker center">Det vi står för</p>
+                <div class="value-grid">
+                    <article class="value-card">
+                        <h3>1944</h3>
+                        <p>En klubb med lång historia i Göteborgs idrottsliv och stark lokal förankring i Angered.</p>
+                    </article>
+                    <article class="value-card">
+                        <h3>För alla</h3>
+                        <p>Barn, ungdomar och vuxna ska kunna känna sig hemma hos oss oavsett erfarenhet.</p>
+                    </article>
+                    <article class="value-card">
+                        <h3>På riktigt</h3>
+                        <p>Trygg, strukturerad och seriös träning utan onödigt krångel, med tydliga ledare och rutiner.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-gallery" id="gallery">
+            <div class="container">
+                <div class="gallery-section-header about-gallery-header">
+                    <div>
+                        <p class="about-kicker">Galleri</p>
+                        <h2 class="gallery-heading">Bilder från vår klubb</h2>
+                    </div>
+                    <p class="gallery-section-copy">Här kan du bläddra bland bilder från träning, tävling och vardag i
+                        klubben.</p>
+                </div>
+                <div class="gallery-grid" id="full-gallery-grid"></div>
+                <div class="gallery-more-actions">
+                    <button class="btn btn-secondary gallery-more-btn" id="gallery-load-more" type="button">Visa
+                        fler</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-cta">
+            <div class="container">
+                <div class="about-cta-card">
+                <p class="about-kicker">Bli en del av klubben</p>
+                <h2>Börja träna med oss</h2>
+                <p>Anmäl dig eller hör av dig så hjälper vi dig vidare till rätt grupp i Angered.</p>
+                <div class="cta-buttons">
+                    <a href="registration.html" class="btn btn-primary">Registrering</a>
+                    <a href="contact.html" class="btn btn-secondary">Kontakt</a>
+                </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="kontakt">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Nylöse SportCenter</h3>
+                    <p>En förening där barn, ungdomar och vuxna kan träna i en trygg och kravlös miljö.</p>
+                    <div class="social-links">
+                        <a target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/NSCABK/" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.6 1.6-1.6H16V4.8c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.9V11H7.8v3h2.3v7h3.4Z" /></svg></a>
+                        <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/nylosegirls/" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2.2A2.8 2.8 0 0 0 4.2 7v10A2.8 2.8 0 0 0 7 19.8h10a2.8 2.8 0 0 0 2.8-2.8V7A2.8 2.8 0 0 0 17 4.2H7Zm10.2 1.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z" /></svg></a>
+                        <a target="_blank" rel="noopener noreferrer" href="https://www.tiktok.com/@nylosegirls" class="social-link" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 2c.4 2.1 1.7 3.8 3.7 4.2v2.9a7 7 0 0 1-3.5-1v5.8a5.8 5.8 0 1 1-5.1-5.7v3a2.9 2.9 0 1 0 2.2 2.8V2h2.7Z" /></svg></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Kontakt</h3>
+                    <ul class="contact-list">
+                        <li>Bergsgårdsgärdet 89C, 424 32 Angered</li>
+                        <li><a href="tel:+46729102575">072-910 25 75</a></li>
+                        <li><a href="tel:+46700424221">070-042 42 21</a></li>
+                        <li><a href="mailto:nylosesportcenter@gmail.com">nylosesportcenter@gmail.com</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Hitta oss</h3>
+                    <iframe class="footer-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1643.034681881022!2d12.016545376067302!3d57.768930134932425!2m3!1f0!2f0!3f0!2m3!1i1024!2i768!4f13.1!3m3!1m2!1s0x464ff5ac90bab69d%3A0x9b8e4e867fb5bd21!2sNyl%C3%B6se%20SportCenter!5e1!3m2!1sen!2sse!4v1766858587956!5m2!1sen!2sse" title="Karta till Nylöse SportCenter" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            <div class="copyright"><p>&copy; Nylöse SportCenter</p></div>
+        </div>
+    </footer>
+
+    <button class="back-to-top" id="back-to-top" type="button" aria-label="Till toppen"><span aria-hidden="true">↑</span></button>
+</body>
+
+</html>

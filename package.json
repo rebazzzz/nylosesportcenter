@@ -1,0 +1,27 @@
+{
+  "name": "nylose",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:assets": "node minify.js",
+    "qa:device-lab": "node scripts/qa-device-lab.js",
+    "test": "npm --prefix backend test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rebazzzz/nylose.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rebazzzz/nylose/issues"
+  },
+  "homepage": "https://github.com/rebazzzz/nylose#readme",
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "playwright": "^1.59.1",
+    "uglify-js": "^3.19.3"
+  }
+}
