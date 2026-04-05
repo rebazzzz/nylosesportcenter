@@ -85,6 +85,10 @@ const adminCreateSchema = z.object({
   phone: z.string().trim().optional().or(z.literal("")),
 });
 
+const adminManualPaymentEmailSchema = z.object({
+  email: z.email({ message: "Ange en giltig e-postadress" }),
+});
+
 const sportSchema = z.object({
   name: z.string().trim().min(1),
   description: z.string().trim().min(1),
@@ -141,8 +145,8 @@ const memberProfileUpdateSchema = z.object({
   address: z.string().trim().min(1, "Adress är obligatorisk").max(200),
 });
 
-function normalizeBody(req) {
-  const body = { ...req.body };
+function normalizeBody(bodyInput) {
+  const body = { ...(bodyInput || {}) };
 
   Object.keys(body).forEach((key) => {
     if (body[key] === "true") body[key] = true;
@@ -158,7 +162,7 @@ function normalizeBody(req) {
 
 function validateBody(schema) {
   return (req, res, next) => {
-    const result = schema.safeParse(normalizeBody(req));
+    const result = schema.safeParse(normalizeBody(req.body));
 
     if (!result.success) {
       return res.status(400).json({
@@ -176,6 +180,7 @@ module.exports = {
   registerSchema,
   loginSchema,
   adminCreateSchema,
+  adminManualPaymentEmailSchema,
   sportSchema,
   scheduleSchema,
   socialLinkSchema,

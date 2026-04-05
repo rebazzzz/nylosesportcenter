@@ -64,7 +64,7 @@ function initializeContactForm() {
 
       contactForm.reset();
       setContactFeedback(
-        "Tack! Ditt meddelande har skickats och klubben återkommer så snart som möjligt.",
+        "Tack! Ditt meddelande har skickats. Du får en bekräftelse via e-post och klubben återkommer så snart som möjligt.",
         "success",
       );
     } catch (error) {

@@ -8,6 +8,7 @@ const path = require("path");
 require("dotenv").config();
 
 const db = require("./database/init");
+const emailService = require("./services/emailService");
 const PUBLIC_ROOT = path.join(__dirname, "..");
 const PUBLIC_IMAGES = path.join(PUBLIC_ROOT, "images");
 const PUBLIC_STYLES = path.join(PUBLIC_ROOT, "styles");
@@ -240,6 +241,7 @@ async function startServer() {
   }
 
   await db.initDatabase();
+  emailService.startInvoiceScheduler(db);
 
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);

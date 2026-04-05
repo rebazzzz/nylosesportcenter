@@ -102,9 +102,11 @@ class Database {
           user_id INTEGER NOT NULL,
           start_date DATE NOT NULL,
           end_date DATE NOT NULL,
+          trial_ends_at DATETIME,
           status TEXT NOT NULL CHECK (status IN ('active', 'expired', 'cancelled')),
           payment_status TEXT NOT NULL CHECK (payment_status IN ('pending', 'paid', 'failed')),
           amount_paid REAL DEFAULT 600.00,
+          invoice_email_sent_at DATETIME,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -213,6 +215,20 @@ class Database {
 
           for (const sql of queries) {
             await this.runQuery(sql);
+          }
+
+          const membershipColumns = await this.getAllQuery("PRAGMA table_info(memberships)");
+          const membershipNames = new Set(membershipColumns.map((column) => column.name));
+
+          if (!membershipNames.has("trial_ends_at")) {
+            await this.runQuery("ALTER TABLE memberships ADD COLUMN trial_ends_at DATETIME");
+            await this.runQuery(
+              "UPDATE memberships SET trial_ends_at = datetime(created_at, '+14 days') WHERE trial_ends_at IS NULL",
+            );
+          }
+
+          if (!membershipNames.has("invoice_email_sent_at")) {
+            await this.runQuery("ALTER TABLE memberships ADD COLUMN invoice_email_sent_at DATETIME");
           }
 
           resolve();
@@ -406,6 +422,69 @@ class Database {
       email: this.decryptValue(row.email),
       message: this.decryptValue(row.message),
     }));
+  }
+
+  async updateMemberProfile(userId, profile) {
+    return this.runQuery(
+      `UPDATE users
+       SET first_name = ?, last_name = ?, phone = ?, address = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [
+        profile.first_name,
+        profile.last_name,
+        this.encryptValue(profile.phone),
+        this.encryptValue(profile.address),
+        userId,
+      ],
+    );
+  }
+
+  async getPendingTrialInvoices() {
+    const rows = await this.getAllQuery(
+      `SELECT m.id, m.user_id, m.start_date, m.end_date, m.trial_ends_at, m.amount_paid,
+              u.email, u.first_name, u.last_name
+       FROM memberships m
+       JOIN users u ON u.id = m.user_id
+       WHERE u.role = 'member'
+         AND u.is_active = 1
+         AND m.status = 'active'
+         AND m.payment_status = 'pending'
+         AND m.invoice_email_sent_at IS NULL
+         AND datetime(COALESCE(m.trial_ends_at, datetime(m.created_at, '+14 days'))) <= datetime('now')
+       ORDER BY m.created_at ASC`,
+    );
+
+    return rows;
+  }
+
+  async markTrialInvoiceSent(membershipId) {
+    return this.runQuery(
+      `UPDATE memberships
+       SET invoice_email_sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [membershipId],
+    );
+  }
+
+  async getMemberWithLatestMembershipByEmail(email) {
+    const row = await this.getQuery(
+      `SELECT u.id as user_id, u.email, u.first_name, u.last_name,
+              m.id as membership_id, m.start_date, m.end_date, m.trial_ends_at,
+              m.status, m.payment_status, m.amount_paid, m.invoice_email_sent_at
+       FROM users u
+       LEFT JOIN memberships m ON m.id = (
+         SELECT m2.id
+         FROM memberships m2
+         WHERE m2.user_id = u.id
+         ORDER BY datetime(m2.created_at) DESC
+         LIMIT 1
+       )
+       WHERE u.email = ? AND u.role = 'member'
+       LIMIT 1`,
+      [email],
+    );
+
+    return row || null;
   }
 
   runQuery(sql, params = []) {

@@ -2,6 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("node:path");
 const fs = require("node:fs");
+const jwt = require("jsonwebtoken");
 const request = require("supertest");
 
 const testDbPath = path.join(__dirname, "test-nylose.db");
@@ -13,10 +14,7 @@ process.env.DB_PATH = testDbPath;
 process.env.ADMIN_BOOTSTRAP_EMAIL = "admin@test.local";
 process.env.ADMIN_BOOTSTRAP_PASSWORD = "VeryStrongTestPassword123!";
 process.env.FRONTEND_URL = "http://localhost:3001";
-process.env.EMAIL_HOST = "";
-process.env.EMAIL_PORT = "";
-process.env.EMAIL_USER = "";
-process.env.EMAIL_PASS = "";
+process.env.BREVO_API_KEY = "";
 process.env.EMAIL_FROM = "";
 
 if (fs.existsSync(testDbPath)) {
@@ -162,4 +160,95 @@ test("contact form submission is stored and visible to admin", async () => {
   assert.equal(submissionsResponse.status, 200);
   assert.equal(submissionsResponse.body.length, 1);
   assert.equal(submissionsResponse.body[0].email, "contact@test.local");
+});
+
+test("member profile updates keep sensitive fields encrypted at rest", async () => {
+  const app = createApp();
+
+  const registerResponse = await request(app).post("/api/auth/register").send({
+    email: "encrypted-profile@test.local",
+    first_name: "Encrypt",
+    last_name: "Me",
+    personnummer: "20000101-1234",
+    phone: "0701231234",
+    address: "Old Street 1",
+  });
+
+  assert.equal(registerResponse.status, 201);
+
+  const member = await db.getUserByEmail("encrypted-profile@test.local");
+  const token = jwt.sign(
+    { userId: member.id, email: member.email, role: "member" },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" },
+  );
+
+  const updateResponse = await request(app)
+    .put("/api/member/profile")
+    .set("Authorization", `Bearer ${token}`)
+    .send({
+      first_name: "Encrypt",
+      last_name: "Updated",
+      phone: "0709998888",
+      address: "New Street 2",
+    });
+
+  assert.equal(updateResponse.status, 200);
+  assert.equal(updateResponse.body.user.phone, "0709998888");
+  assert.equal(updateResponse.body.user.address, "New Street 2");
+
+  const rawUser = await db.getQuery(
+    "SELECT phone, address FROM users WHERE email = ?",
+    ["encrypted-profile@test.local"],
+  );
+
+  assert.match(rawUser.phone, /^enc:v1:/);
+  assert.match(rawUser.address, /^enc:v1:/);
+  assert.notEqual(rawUser.phone, "0709998888");
+  assert.notEqual(rawUser.address, "New Street 2");
+});
+
+test("admin can manually send payment info to a specific member email", async () => {
+  const app = createApp();
+
+  process.env.BREVO_API_KEY = "test-api-key";
+  process.env.EMAIL_FROM = "noreply@test.local";
+
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: true,
+    json: async () => ({ messageId: "test-message-id" }),
+  });
+
+  try {
+    const registerResponse = await request(app).post("/api/auth/register").send({
+      email: "manual-payment@test.local",
+      first_name: "Manual",
+      last_name: "Member",
+      personnummer: "19990101-1234",
+      phone: "0703334444",
+      address: "Admin Street 3",
+    });
+
+    assert.equal(registerResponse.status, 201);
+
+    const loginResponse = await request(app).post("/api/auth/login").send({
+      email: "admin@test.local",
+      password: "VeryStrongTestPassword123!",
+    });
+
+    const manualSendResponse = await request(app)
+      .post("/api/admin/send-payment-info")
+      .set("Cookie", loginResponse.headers["set-cookie"])
+      .send({
+        email: "manual-payment@test.local",
+      });
+
+    assert.equal(manualSendResponse.status, 200);
+    assert.match(manualSendResponse.body.message, /Betaluppgifterna har skickats/i);
+  } finally {
+    global.fetch = originalFetch;
+    process.env.BREVO_API_KEY = "";
+    process.env.EMAIL_FROM = "";
+  }
 });

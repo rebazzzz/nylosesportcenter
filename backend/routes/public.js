@@ -1,6 +1,7 @@
 const express = require("express");
 const rateLimit = require("express-rate-limit");
 const db = require("../database/init");
+const emailService = require("../services/emailService");
 const {
   validateBody,
   contactSubmissionSchema,
@@ -77,6 +78,15 @@ router.post(
       const { name, email, message } = req.validatedBody;
       await db.createContactSubmission({ name, email, message });
       res.status(201).json({ message: "Meddelandet har skickats" });
+
+      Promise.allSettled([
+        emailService.sendContactConfirmation(email, { name, email, message }),
+        emailService.sendContactNotification({ name, email, message }),
+      ]).then((results) => {
+        results
+          .filter((result) => result.status === "rejected")
+          .forEach((result) => console.error("Contact email flow failed:", result.reason));
+      });
     } catch (error) {
       console.error("Contact submission error:", error);
       res.status(500).json({ error: "Meddelandet kunde inte skickas" });

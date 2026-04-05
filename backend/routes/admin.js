@@ -1,5 +1,7 @@
 const express = require("express");
 const db = require("../database/init");
+const emailService = require("../services/emailService");
+const { validateBody, adminManualPaymentEmailSchema } = require("../middleware/validation");
 const {
   authenticateToken,
   requireAdmin,
@@ -56,6 +58,49 @@ router.get("/contact-submissions", async (req, res) => {
   } catch (error) {
     console.error("Error fetching contact submissions:", error);
     res.status(500).json({ error: "Failed to fetch contact submissions" });
+  }
+});
+
+router.post("/send-payment-info", validateBody(adminManualPaymentEmailSchema), async (req, res) => {
+  try {
+    const { email } = req.validatedBody;
+    const member = await db.getMemberWithLatestMembershipByEmail(email);
+
+    if (!member) {
+      return res.status(404).json({ error: "Ingen medlem hittades med den e-postadressen" });
+    }
+
+    if (!member.membership_id) {
+      return res.status(400).json({ error: "Medlemmen har inget medlemskap att skicka betaluppgifter för" });
+    }
+
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 10);
+
+    const result = await emailService.sendManualPaymentInfo(member.email, {
+      first_name: member.first_name,
+      membership_start: member.start_date,
+      membership_end: member.end_date,
+      due_date: dueDate.toISOString(),
+      amount: member.amount_paid || 600,
+    });
+
+    if (!result.success) {
+      return res.status(502).json({ error: result.error || "Betaluppgifterna kunde inte skickas" });
+    }
+
+    await emailService.sendAdminInvoiceAlert({
+      first_name: member.first_name,
+      last_name: member.last_name,
+      email: member.email,
+      amount: member.amount_paid || 600,
+      trigger: "Manuellt från adminpanelen",
+    });
+
+    res.json({ message: "Betaluppgifterna har skickats" });
+  } catch (error) {
+    console.error("Error sending manual payment info:", error);
+    res.status(500).json({ error: "Betaluppgifterna kunde inte skickas" });
   }
 });
 

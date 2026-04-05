@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
           registrationForm.reset();
           toggleParentFields(false);
           setRegistrationFeedback(
-            "Tack! Din anmälan är skickad.",
+            "Tack! Din anmälan är skickad. En bekräftelse med information om prova-på-perioden kommer via e-post.",
             "success",
           );
         } else {

@@ -126,6 +126,39 @@ function renderSummary() {
     .join("");
 }
 
+async function sendManualPaymentInfo(event) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const emailInput = document.getElementById("manual-payment-email");
+  const submitButton = document.getElementById("manual-payment-submit");
+  const email = emailInput.value.trim();
+
+  if (!email) {
+    showToast("Ange en e-postadress först.", true);
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Skickar...';
+
+  try {
+    const result = await apiFetch("/admin/send-payment-info", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+
+    form.reset();
+    showToast(result.message || "Betaluppgifterna har skickats");
+  } catch (error) {
+    showToast(error.message || "Kunde inte skicka betaluppgifterna", true);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.innerHTML =
+      '<i class="fas fa-paper-plane"></i> Skicka betaluppgifter';
+  }
+}
+
 function getFilteredMembers() {
   const query = document.getElementById("members-search").value.trim().toLowerCase();
   return state.members.filter((member) => {
@@ -421,6 +454,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     .getElementById("export-contacts")
     .addEventListener("click", exportContactSubmissions);
   document.getElementById("refresh-dashboard").addEventListener("click", refreshDashboard);
+  document
+    .getElementById("manual-payment-form")
+    .addEventListener("submit", sendManualPaymentInfo);
   document.getElementById("logout-btn").addEventListener("click", async () => {
     await fetch(`${DASHBOARD_API_BASE_URL}/auth/logout`, {
       method: "POST",

@@ -105,13 +105,16 @@ router.post("/register", registerLimiter, validateBody(registerSchema), async (r
     const startDate = new Date();
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + 3);
+    const trialEndsAt = new Date(startDate);
+    trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
     await db.runQuery(
-      "INSERT INTO memberships (user_id, start_date, end_date, status, payment_status, amount_paid) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO memberships (user_id, start_date, end_date, trial_ends_at, status, payment_status, amount_paid) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         result.id,
         startDate.toISOString().split("T")[0],
         endDate.toISOString().split("T")[0],
+        trialEndsAt.toISOString(),
         "active",
         "pending",
         600.0,
@@ -135,9 +138,22 @@ router.post("/register", registerLimiter, validateBody(registerSchema), async (r
         last_name,
         membership_start: startDate.toISOString().split("T")[0],
         membership_end: endDate.toISOString().split("T")[0],
+        trial_ends_at: trialEndsAt.toISOString(),
       })
       .catch((error) => {
         console.error("Failed to send registration email:", error);
+      });
+
+    emailService
+      .sendAdminSignupAlert({
+        first_name,
+        last_name,
+        email,
+        phone,
+        trial_ends_at: trialEndsAt.toISOString(),
+      })
+      .catch((error) => {
+        console.error("Failed to send admin signup alert:", error);
       });
   } catch (error) {
     console.error("Registration error:", error);

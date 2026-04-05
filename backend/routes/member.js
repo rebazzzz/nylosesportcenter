@@ -161,10 +161,12 @@ router.put("/profile", validateBody(memberProfileUpdateSchema), async (req, res)
     const userId = req.user.id;
     const { first_name, last_name, phone, address } = req.validatedBody;
 
-    await db.runQuery(
-      "UPDATE users SET first_name = ?, last_name = ?, phone = ?, address = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-      [first_name, last_name, phone, address, userId]
-    );
+    await db.updateMemberProfile(userId, {
+      first_name,
+      last_name,
+      phone,
+      address,
+    });
 
     const updatedUser = await db.getUserById(userId);
     res.json({

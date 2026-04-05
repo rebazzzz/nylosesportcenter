@@ -59,6 +59,27 @@
             <section class="panel-shell">
                 <div class="panel-header">
                     <div>
+                        <p class="eyebrow">Betalningar</p>
+                        <h3>Skicka betaluppgifter manuellt</h3>
+                    </div>
+                </div>
+                <form id="manual-payment-form" class="admin-inline-form">
+                    <div class="form-group">
+                        <label for="manual-payment-email">Medlemmens e-postadress</label>
+                        <input id="manual-payment-email" name="email" type="email"
+                            placeholder="namn@exempel.se" required>
+                    </div>
+                    <button id="manual-payment-submit" class="btn btn-primary" type="submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Skicka betaluppgifter
+                    </button>
+                </form>
+                <p class="manual-payment-note">Det här utskicket skickas utan texten om att ignorera mejlet efter prova-på. Använd det bara när ni medvetet vill skicka betalinfo manuellt.</p>
+            </section>
+
+            <section class="panel-shell">
+                <div class="panel-header">
+                    <div>
                         <p class="eyebrow">Registreringar</p>
                         <h3>Alla som har anmält sig</h3>
                     </div>
