@@ -14,15 +14,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerBtn = document.getElementById("register-btn");
   const registrationForm = document.querySelector(".registration-form");
 
-  function calculateAgeFromPersonnummer(personnummer) {
+  function parseBirthDateFromPersonnummer(personnummer) {
     const digits = personnummer.replace(/[^0-9]/g, "");
     if (digits.length !== 12) return null;
 
     const year = Number(digits.slice(0, 4));
-    const month = Number(digits.slice(4, 6)) - 1;
+    const month = Number(digits.slice(4, 6));
     const day = Number(digits.slice(6, 8));
-    const birthDate = new Date(year, month, day);
-    const today = new Date();
+    const birthDate = new Date(year, month - 1, day);
+
+    if (
+      Number.isNaN(birthDate.getTime()) ||
+      birthDate.getFullYear() !== year ||
+      birthDate.getMonth() !== month - 1 ||
+      birthDate.getDate() !== day
+    ) {
+      return null;
+    }
+
+    birthDate.setHours(0, 0, 0, 0);
+    return birthDate;
+  }
+
+  function calculateAgeFromPersonnummer(personnummer, referenceDate = new Date()) {
+    const birthDate = parseBirthDateFromPersonnummer(personnummer);
+    if (!birthDate) return null;
+
+    const today = new Date(referenceDate);
+    today.setHours(0, 0, 0, 0);
 
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -36,8 +55,17 @@ document.addEventListener("DOMContentLoaded", () => {
   function toggleParentFields(isVisible) {
     parentFields.forEach((field) => {
       field.style.display = isVisible ? "flex" : "none";
+      field.setAttribute("aria-hidden", String(!isVisible));
+
       const input = field.querySelector("input");
-      if (input) input.required = isVisible;
+      if (input) {
+        input.required = isVisible;
+        input.disabled = !isVisible;
+
+        if (!isVisible) {
+          input.value = "";
+        }
+      }
     });
   }
 
@@ -57,6 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleParentFields(age !== null && age < 18);
     });
   }
+
+  toggleParentFields(false);
 
   if (registrationForm && registerBtn) {
     registrationForm.addEventListener("submit", async (event) => {

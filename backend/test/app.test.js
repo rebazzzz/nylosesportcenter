@@ -26,6 +26,17 @@ if (fs.existsSync(testDbPath)) {
 const db = require("../database/init");
 const { createApp } = require("../server");
 
+function formatPersonnummerDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}${month}${day}`;
+}
+
+function subtractYears(date, years) {
+  return new Date(date.getFullYear() - years, date.getMonth(), date.getDate());
+}
+
 test.before(async () => {
   await db.initDatabase();
 });
@@ -90,6 +101,42 @@ test("member registration is accepted and visible in admin list", async () => {
   assert.equal(membersResponse.body.length, 1);
   assert.equal(membersResponse.body[0].email, "member@test.local");
   assert.equal(membersResponse.body[0].personnummer, "20120101-1234");
+});
+
+test("registration does not require parent details on the 18th birthday", async () => {
+  const app = createApp();
+  const today = new Date();
+  const turned18Today = `${formatPersonnummerDate(subtractYears(today, 18))}-1234`;
+
+  const response = await request(app).post("/api/auth/register").send({
+    email: "adult18today@test.local",
+    first_name: "Adult",
+    last_name: "Today",
+    personnummer: turned18Today,
+    phone: "0701112233",
+    address: "Birthday Street 18",
+  });
+
+  assert.equal(response.status, 201);
+});
+
+test("registration still requires parent details until the 18th birthday has passed", async () => {
+  const app = createApp();
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const turns18Tomorrow = `${formatPersonnummerDate(subtractYears(tomorrow, 18))}-1234`;
+
+  const response = await request(app).post("/api/auth/register").send({
+    email: "minor17@test.local",
+    first_name: "Minor",
+    last_name: "Tomorrow",
+    personnummer: turns18Tomorrow,
+    phone: "0703332211",
+    address: "Guardian Street 17",
+  });
+
+  assert.equal(response.status, 400);
+  assert.match(response.body.error, /V.+rdnadshavares namn och telefon/i);
 });
 
 test("contact form submission is stored and visible to admin", async () => {

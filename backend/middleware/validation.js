@@ -19,10 +19,23 @@ function isMinorFromPersonnummer(personnummer) {
 
   const [birthPart] = personnummer.split("-");
   const year = Number(birthPart.slice(0, 4));
-  const month = Number(birthPart.slice(4, 6)) - 1;
+  const month = Number(birthPart.slice(4, 6));
   const day = Number(birthPart.slice(6, 8));
-  const birthDate = new Date(year, month, day);
+  const birthDate = new Date(year, month - 1, day);
+
+  if (
+    Number.isNaN(birthDate.getTime()) ||
+    birthDate.getFullYear() !== year ||
+    birthDate.getMonth() !== month - 1 ||
+    birthDate.getDate() !== day
+  ) {
+    return false;
+  }
+
+  birthDate.setHours(0, 0, 0, 0);
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
 
