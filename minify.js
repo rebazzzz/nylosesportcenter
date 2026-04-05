@@ -88,16 +88,16 @@ function generateMediaManifest() {
 
 function generateSitemap() {
   const sitemapPages = [
-    { loc: "https://nylosesportcenter.se/nylose/", priority: "1.0", changefreq: "weekly" },
-    { loc: "https://nylosesportcenter.se/nylose/about.html", priority: "0.8", changefreq: "monthly" },
-    { loc: "https://nylosesportcenter.se/nylose/contact.html", priority: "0.8", changefreq: "monthly" },
-    { loc: "https://nylosesportcenter.se/nylose/registration.html", priority: "0.8", changefreq: "monthly" },
-    { loc: "https://nylosesportcenter.se/nylose/brottning-goteborg.html", priority: "0.85", changefreq: "monthly" },
-    { loc: "https://nylosesportcenter.se/nylose/brottning-barn-goteborg.html", priority: "0.84", changefreq: "monthly" },
-    { loc: "https://nylosesportcenter.se/nylose/brottning-vuxna-goteborg.html", priority: "0.84", changefreq: "monthly" },
-    { loc: "https://nylosesportcenter.se/nylose/girls-only-goteborg.html", priority: "0.84", changefreq: "monthly" },
-    { loc: "https://nylosesportcenter.se/nylose/wresfit-goteborg.html", priority: "0.84", changefreq: "monthly" },
-    { loc: "https://nylosesportcenter.se/nylose/kampsport-angered.html", priority: "0.84", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/", priority: "1.0", changefreq: "weekly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/about.html", priority: "0.8", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/contact.html", priority: "0.8", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/registration.html", priority: "0.8", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/brottning-goteborg.html", priority: "0.85", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/brottning-barn-goteborg.html", priority: "0.84", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/brottning-vuxna-goteborg.html", priority: "0.84", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/girls-only-goteborg.html", priority: "0.84", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/wresfit-goteborg.html", priority: "0.84", changefreq: "monthly" },
+    { loc: "https://rebazzzz.github.io/nylosesportcenter/kampsport-angered.html", priority: "0.84", changefreq: "monthly" },
   ];
 
   const lastmod = new Date().toISOString().slice(0, 10);
@@ -109,6 +109,12 @@ function generateSitemap() {
 
   fs.writeFileSync("sitemap.xml", xml, "utf8");
   console.log(`Generated sitemap for ${sitemapPages.length} public pages.`);
+}
+
+function generateRobots() {
+  const robots = `User-agent: *\nAllow: /\nSitemap: https://rebazzzz.github.io/nylosesportcenter/sitemap.xml\n`;
+  fs.writeFileSync("robots.txt", robots, "utf8");
+  console.log("Generated robots.txt.");
 }
 
 // Function to minify JS files
@@ -203,6 +209,7 @@ function validateHtmlReferences() {
 console.log("Starting minification...");
 generateMediaManifest();
 generateSitemap();
+generateRobots();
 minifyJS();
 minifyCSS();
 validateHtmlReferences();
