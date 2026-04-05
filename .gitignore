@@ -22,6 +22,7 @@ secrets/
 *.db-*
 *.sqlite
 *.sqlite3
+scripts/reset-db-keep-admin.js
 backend/database/*.db
 backend/uploads/
 uploads/

@@ -151,6 +151,7 @@ function minifyCSS() {
 
 function validateHtmlReferences() {
   const issues = [];
+  const normalizeAssetPath = (assetPath) => assetPath.split("?")[0].split("#")[0];
 
   htmlFiles.forEach((file) => {
     const contents = fs.readFileSync(file, "utf8");
@@ -163,25 +164,27 @@ function validateHtmlReferences() {
     ].map((match) => match[1]);
 
     scriptMatches.forEach((src) => {
+      const normalizedSrc = normalizeAssetPath(src);
       if (src.startsWith("http")) {
         return;
       }
       if (src.startsWith("js/") && !src.startsWith("js/min/")) {
         issues.push(`${file}: non-minified script reference -> ${src}`);
       }
-      if (src.startsWith("js/min/") && !fs.existsSync(src)) {
+      if (src.startsWith("js/min/") && !fs.existsSync(normalizedSrc)) {
         issues.push(`${file}: missing minified script -> ${src}`);
       }
     });
 
     styleMatches.forEach((href) => {
+      const normalizedHref = normalizeAssetPath(href);
       if (href.startsWith("http")) {
         return;
       }
       if (href.startsWith("styles/") && !href.startsWith("styles/min/")) {
         issues.push(`${file}: non-minified stylesheet reference -> ${href}`);
       }
-      if (href.startsWith("styles/min/") && !fs.existsSync(href)) {
+      if (href.startsWith("styles/min/") && !fs.existsSync(normalizedHref)) {
         issues.push(`${file}: missing minified stylesheet -> ${href}`);
       }
     });

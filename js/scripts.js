@@ -104,15 +104,20 @@ function initializeScheduleFilters() {
   const applyFilter = (filter) => {
     dayContainers.forEach((day) => {
       let hasVisibleSession = false;
+
       day.querySelectorAll(".session-card").forEach((session) => {
         const shouldShow =
           filter === "all" || session.dataset.filter === filter;
+
         session.hidden = !shouldShow;
+        session.style.display = shouldShow ? "" : "none";
         if (shouldShow) {
           hasVisibleSession = true;
         }
       });
+
       day.hidden = !hasVisibleSession;
+      day.style.display = hasVisibleSession ? "" : "none";
     });
 
     filterButtons.forEach((button) => {
@@ -121,8 +126,12 @@ function initializeScheduleFilters() {
   };
 
   filterButtons.forEach((button) => {
-    button.addEventListener("click", () => applyFilter(button.dataset.filter || "all"));
+    button.addEventListener("click", () => {
+      applyFilter(button.dataset.filter || "all");
+    });
   });
+
+  applyFilter("all");
 }
 
 function buildGalleryCard(media) {
