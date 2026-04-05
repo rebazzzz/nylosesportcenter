@@ -148,6 +148,11 @@ function createPaymentDetailsMarkup() {
   return details.join("");
 }
 
+function createContactLink() {
+  const email = escapeHtml(DEFAULT_BRAND.contactEmail);
+  return `<a href="mailto:${email}" style="color:${DEFAULT_BRAND.primary};text-decoration:none;font-weight:600;">${email}</a>`;
+}
+
 class EmailService {
   buildContactConfirmationEmail(userEmail, payload) {
     return {
@@ -167,7 +172,7 @@ class EmailService {
           href: DEFAULT_BRAND.siteUrl,
           label: "Besök hemsidan",
         },
-        footnote: `Du kan svara på detta mejl eller skriva till ${escapeHtml(DEFAULT_BRAND.contactEmail)} om du vill lägga till något.`,
+        footnote: `Du kan svara på detta mejl eller skriva till ${createContactLink()} om du vill lägga till något.`,
       }),
       textContent: `Hej ${payload.name}, vi har tagit emot ditt meddelande och återkommer så snart vi kan.`,
       replyTo: DEFAULT_BRAND.contactEmail,
@@ -277,7 +282,7 @@ class EmailService {
           href: DEFAULT_BRAND.siteUrl,
           label: "Se hemsidan",
         },
-        footnote: `Frågor? Kontakta oss på ${escapeHtml(DEFAULT_BRAND.contactEmail)}.`,
+        footnote: `Frågor? Kontakta oss på ${createContactLink()}.`,
       }),
       textContent: `Hej ${userData.first_name}! Din anmälan är mottagen. Du har två veckors gratis prova-på till och med ${trialEndDate}. Efter det skickar vi betaluppgifter automatiskt. Om du inte vill fortsätta kan du ignorera det mejlet.`,
       replyTo: DEFAULT_BRAND.contactEmail,
@@ -347,7 +352,7 @@ class EmailService {
             body: createPaymentDetailsMarkup(),
           },
         ],
-        footnote: `Frågor? Kontakta oss på ${escapeHtml(DEFAULT_BRAND.contactEmail)}.`,
+        footnote: `Frågor? Kontakta oss på ${createContactLink()}.`,
       }),
       textContent: `Hej ${invoiceData.first_name}. Här kommer betaluppgifterna för ditt medlemskap. Belopp: ${invoiceData.amount} kr. Förfallodatum: ${dueDate}.`,
       replyTo: DEFAULT_BRAND.contactEmail,
