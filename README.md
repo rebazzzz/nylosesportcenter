@@ -51,6 +51,25 @@ cd backend
 npm test
 ```
 
+## Email Previews
+
+Render all email templates locally without configuring Brevo:
+```bash
+npm run preview:emails
+```
+
+Then open:
+- `backend/email-previews/index.html`
+
+That preview folder includes all current templates:
+- Contact confirmation to visitor
+- Contact notification to admin
+- Signup confirmation to member
+- Signup alert to admin
+- Automatic payment email after free trial
+- Admin alert when payment info is sent
+- Manual payment email from admin
+
 ## Production Notes
 
 - The backend serves the frontend, so one Node service is enough

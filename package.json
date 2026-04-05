@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build:assets": "node minify.js",
+    "preview:emails": "node backend/scripts/generate-email-previews.js",
     "qa:device-lab": "node scripts/qa-device-lab.js",
     "test": "npm --prefix backend test"
   },

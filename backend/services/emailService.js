@@ -2,13 +2,12 @@ const DEFAULT_BRAND = {
   name: "Nylöse SportCenter",
   siteUrl: process.env.PUBLIC_APP_URL || process.env.FRONTEND_URL || "http://localhost:3001",
   contactEmail: process.env.EMAIL_REPLY_TO || "nylosesportcenter@gmail.com",
-  primary: "#0f2742",
-  accent: "#f0c419",
-  warm: "#d62828",
-  dark: "#101820",
+  primary: "#102a43",
+  dark: "#111111",
   light: "#ffffff",
-  muted: "#eef2f6",
-  body: "#243447",
+  muted: "#f4f4f1",
+  body: "#25313d",
+  border: "#dde3e8",
 };
 
 let invoiceScheduler = null;
@@ -47,21 +46,35 @@ function normalizeMultilineText(value) {
   return escapeHtml(value).replace(/\r?\n/g, "<br>");
 }
 
+function createMetaList(items) {
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+      ${items
+        .filter((item) => item && item.value)
+        .map(
+          (item) => `
+            <tr>
+              <td style="padding:0 0 10px;vertical-align:top;width:138px;font-size:14px;line-height:1.6;color:#5e6975;">
+                ${escapeHtml(item.label)}
+              </td>
+              <td style="padding:0 0 10px;vertical-align:top;font-size:15px;line-height:1.6;color:${DEFAULT_BRAND.dark};font-weight:600;">
+                ${item.value}
+              </td>
+            </tr>`,
+        )
+        .join("")}
+    </table>
+  `;
+}
+
 function createEmailShell({ eyebrow, title, intro, sections = [], cta, footnote }) {
   const sectionMarkup = sections
     .map(
       (section) => `
         <tr>
-          <td style="padding:0 32px 18px;">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #d8dee6;border-radius:18px;background:${section.background || DEFAULT_BRAND.light};">
-              <tr>
-                <td style="padding:20px 22px;">
-                  ${section.kicker ? `<p style="margin:0 0 8px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:${DEFAULT_BRAND.warm};font-weight:700;">${section.kicker}</p>` : ""}
-                  ${section.heading ? `<h2 style="margin:0 0 10px;font-size:20px;line-height:1.3;color:${DEFAULT_BRAND.dark};">${section.heading}</h2>` : ""}
-                  ${section.body ? `<div style="font-size:15px;line-height:1.7;color:${DEFAULT_BRAND.body};">${section.body}</div>` : ""}
-                </td>
-              </tr>
-            </table>
+          <td style="padding:0 36px 24px;">
+            ${section.heading ? `<h2 style="margin:0 0 10px;font-size:18px;line-height:1.35;color:${DEFAULT_BRAND.dark};">${section.heading}</h2>` : ""}
+            ${section.body ? `<div style="font-size:15px;line-height:1.75;color:${DEFAULT_BRAND.body};">${section.body}</div>` : ""}
           </td>
         </tr>`,
     )
@@ -70,8 +83,8 @@ function createEmailShell({ eyebrow, title, intro, sections = [], cta, footnote 
   const ctaMarkup = cta
     ? `
       <tr>
-        <td style="padding:6px 32px 28px;text-align:center;">
-          <a href="${escapeHtml(cta.href)}" style="display:inline-block;background:${DEFAULT_BRAND.primary};color:${DEFAULT_BRAND.light};text-decoration:none;padding:14px 24px;border-radius:999px;font-size:15px;font-weight:700;">${cta.label}</a>
+        <td style="padding:0 36px 28px;">
+          <a href="${escapeHtml(cta.href)}" style="display:inline-block;background:${DEFAULT_BRAND.primary};color:${DEFAULT_BRAND.light};text-decoration:none;padding:14px 22px;border-radius:999px;font-size:15px;font-weight:700;">${cta.label}</a>
         </td>
       </tr>`
     : "";
@@ -88,31 +101,24 @@ function createEmailShell({ eyebrow, title, intro, sections = [], cta, footnote 
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6f8;padding:24px 12px;">
           <tr>
             <td align="center">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:${DEFAULT_BRAND.light};border-radius:24px;overflow:hidden;border:1px solid #dbe3eb;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:${DEFAULT_BRAND.light};border-radius:18px;overflow:hidden;border:1px solid ${DEFAULT_BRAND.border};">
                 <tr>
-                  <td style="padding:0;background:linear-gradient(135deg, ${DEFAULT_BRAND.primary} 0%, ${DEFAULT_BRAND.dark} 72%, ${DEFAULT_BRAND.warm} 100%);">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                      <tr>
-                        <td style="padding:32px;">
-                          <p style="margin:0 0 10px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${DEFAULT_BRAND.accent};font-weight:700;">${escapeHtml(eyebrow)}</p>
-                          <h1 style="margin:0 0 12px;font-size:30px;line-height:1.15;color:${DEFAULT_BRAND.light};">${escapeHtml(title)}</h1>
-                          <p style="margin:0;font-size:16px;line-height:1.7;color:rgba(255,255,255,0.92);">${intro}</p>
-                        </td>
-                      </tr>
-                    </table>
+                  <td style="height:8px;background:${DEFAULT_BRAND.primary};font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td style="padding:34px 36px 26px;">
+                    <p style="margin:0 0 10px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#5f6974;font-weight:700;">${escapeHtml(eyebrow)}</p>
+                    <h1 style="margin:0 0 14px;font-size:30px;line-height:1.18;color:${DEFAULT_BRAND.dark};">${escapeHtml(title)}</h1>
+                    <p style="margin:0;font-size:16px;line-height:1.75;color:${DEFAULT_BRAND.body};">${intro}</p>
                   </td>
                 </tr>
                 ${sectionMarkup}
                 ${ctaMarkup}
                 <tr>
-                  <td style="padding:0 32px 32px;">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${DEFAULT_BRAND.muted};border-radius:18px;">
-                      <tr>
-                        <td style="padding:18px 20px;font-size:13px;line-height:1.7;color:#536273;">
-                          ${footnote}
-                        </td>
-                      </tr>
-                    </table>
+                  <td style="padding:0 36px 36px;border-top:1px solid #edf1f4;">
+                    <div style="padding-top:18px;font-size:13px;line-height:1.7;color:#6a7380;">
+                      ${footnote}
+                    </div>
                   </td>
                 </tr>
               </table>
@@ -140,6 +146,211 @@ function createPaymentDetailsMarkup() {
 }
 
 class EmailService {
+  buildContactConfirmationEmail(userEmail, payload) {
+    return {
+      to: userEmail,
+      subject: "Vi har tagit emot ditt meddelande",
+      htmlContent: createEmailShell({
+        eyebrow: DEFAULT_BRAND.name,
+        title: "Tack för ditt meddelande",
+        intro: `Hej ${escapeHtml(payload.name)}. Vi har tagit emot ditt meddelande och återkommer så snart vi kan.`,
+        sections: [
+          {
+            heading: "Ditt meddelande",
+            body: `<p style="margin:0;">${normalizeMultilineText(payload.message)}</p>`,
+          },
+        ],
+        cta: {
+          href: DEFAULT_BRAND.siteUrl,
+          label: "Besök hemsidan",
+        },
+        footnote: `Du kan svara på detta mejl eller skriva till ${escapeHtml(DEFAULT_BRAND.contactEmail)} om du vill lägga till något.`,
+      }),
+      textContent: `Hej ${payload.name}, vi har tagit emot ditt meddelande och återkommer så snart vi kan.`,
+      replyTo: DEFAULT_BRAND.contactEmail,
+    };
+  }
+
+  buildContactNotificationEmail(payload) {
+    return {
+      to: DEFAULT_BRAND.contactEmail,
+      subject: `Nytt kontaktmeddelande från ${payload.name}`,
+      htmlContent: createEmailShell({
+        eyebrow: DEFAULT_BRAND.name,
+        title: "Nytt kontaktmeddelande",
+        intro: "Ett nytt meddelande har skickats via hemsidan.",
+        sections: [
+          {
+            body: `${createMetaList([
+              { label: "Namn", value: escapeHtml(payload.name) },
+              { label: "E-post", value: escapeHtml(payload.email) },
+            ])}<p style="margin:10px 0 0;">${normalizeMultilineText(payload.message)}</p>`,
+          },
+        ],
+        footnote: "Skickat automatiskt från kontaktformuläret.",
+      }),
+      textContent: `${payload.name} (${payload.email}) skrev: ${payload.message}`,
+      replyTo: payload.email,
+    };
+  }
+
+  buildAdminSignupAlertEmail(payload) {
+    return {
+      to: DEFAULT_BRAND.contactEmail,
+      subject: `Ny anmälan: ${payload.first_name} ${payload.last_name}`,
+      htmlContent: createEmailShell({
+        eyebrow: DEFAULT_BRAND.name,
+        title: "Ny anmälan",
+        intro: "En ny medlem har registrerat sig via hemsidan.",
+        sections: [
+          {
+            body: createMetaList([
+              {
+                label: "Namn",
+                value: `${escapeHtml(payload.first_name)} ${escapeHtml(payload.last_name)}`,
+              },
+              { label: "E-post", value: escapeHtml(payload.email) },
+              { label: "Telefon", value: escapeHtml(payload.phone || "-") },
+              { label: "Prova-på till", value: escapeHtml(formatDate(payload.trial_ends_at)) },
+            ]),
+          },
+        ],
+        footnote: "Skickat automatiskt efter en ny registrering.",
+      }),
+      textContent: `Ny registrering: ${payload.first_name} ${payload.last_name}, ${payload.email}, prova-på till ${formatDate(payload.trial_ends_at)}.`,
+      replyTo: DEFAULT_BRAND.contactEmail,
+    };
+  }
+
+  buildAdminInvoiceAlertEmail(payload) {
+    return {
+      to: DEFAULT_BRAND.contactEmail,
+      subject: `Betalinfo skickad: ${payload.first_name} ${payload.last_name || ""}`.trim(),
+      htmlContent: createEmailShell({
+        eyebrow: DEFAULT_BRAND.name,
+        title: "Betaluppgifter skickade",
+        intro: "Betaluppgifter har skickats till en medlem.",
+        sections: [
+          {
+            body: createMetaList([
+              {
+                label: "Mottagare",
+                value: `${escapeHtml(payload.first_name)} ${escapeHtml(payload.last_name || "")}`.trim(),
+              },
+              { label: "E-post", value: escapeHtml(payload.email) },
+              { label: "Typ", value: escapeHtml(payload.trigger || "Automatiskt utskick") },
+              { label: "Belopp", value: `${escapeHtml(String(payload.amount))} kr` },
+            ]),
+          },
+        ],
+        footnote: "Skickat automatiskt när betaluppgifter mejlades ut.",
+      }),
+      textContent: `Betaluppgifter skickade till ${payload.first_name} ${payload.last_name || ""} (${payload.email}). Typ: ${payload.trigger || "Automatiskt utskick"}.`,
+      replyTo: DEFAULT_BRAND.contactEmail,
+    };
+  }
+
+  buildRegistrationConfirmationEmail(userEmail, userData) {
+    const membershipStart = formatDate(userData.membership_start);
+    const membershipEnd = formatDate(userData.membership_end);
+    const trialEndDate = formatDate(userData.trial_ends_at || addDays(userData.membership_start, 14));
+
+    return {
+      to: userEmail,
+      subject: "Din anmälan till Nylöse SportCenter är mottagen",
+      htmlContent: createEmailShell({
+        eyebrow: DEFAULT_BRAND.name,
+        title: "Välkommen till klubben",
+        intro: `Hej ${escapeHtml(userData.first_name)}. Din anmälan är mottagen och du är varmt välkommen att börja träna med oss.`,
+        sections: [
+          {
+            body: `${createMetaList([
+              { label: "Period", value: `${escapeHtml(membershipStart)} till ${escapeHtml(membershipEnd)}` },
+              { label: "Prova-på till", value: escapeHtml(trialEndDate) },
+            ])}<p style="margin:8px 0 0;">Efter prova-på-perioden skickar vi betaluppgifterna automatiskt. Om du inte vill fortsätta kan du ignorera det mejlet.</p>`,
+          },
+        ],
+        cta: {
+          href: DEFAULT_BRAND.siteUrl,
+          label: "Se hemsidan",
+        },
+        footnote: `Frågor? Kontakta oss på ${escapeHtml(DEFAULT_BRAND.contactEmail)}.`,
+      }),
+      textContent: `Hej ${userData.first_name}! Din anmälan är mottagen. Du har två veckors gratis prova-på till och med ${trialEndDate}. Efter det skickar vi betaluppgifter automatiskt. Om du inte vill fortsätta kan du ignorera det mejlet.`,
+      replyTo: DEFAULT_BRAND.contactEmail,
+    };
+  }
+
+  buildTrialInvoiceEmail(userEmail, invoiceData) {
+    const dueDate = formatDate(invoiceData.due_date);
+
+    return {
+      to: userEmail,
+      subject: "Betaluppgifter för medlemskap",
+      htmlContent: createEmailShell({
+        eyebrow: DEFAULT_BRAND.name,
+        title: "Betaluppgifter för medlemskap",
+        intro: `Hej ${escapeHtml(invoiceData.first_name)}. Här kommer betaluppgifterna om du vill fortsätta träna hos oss.`,
+        sections: [
+          {
+            body: createMetaList([
+              { label: "Belopp", value: `${escapeHtml(String(invoiceData.amount))} kr` },
+              {
+                label: "Period",
+                value: `${escapeHtml(formatDate(invoiceData.membership_start))} till ${escapeHtml(formatDate(invoiceData.membership_end))}`,
+              },
+              { label: "Förfallodatum", value: escapeHtml(dueDate) },
+            ]),
+          },
+          {
+            heading: "Betalningsuppgifter",
+            body: createPaymentDetailsMarkup(),
+          },
+          {
+            heading: "Om du inte vill fortsätta",
+            body: "<p style=\"margin:0;\">Om du inte vill fortsätta efter prova-på-perioden behöver du inte göra någonting. Du kan ignorera detta mejl.</p>",
+          },
+        ],
+        footnote: `Ange gärna medlemsnamn${invoiceData.invoice_reference ? ` och referens ${escapeHtml(invoiceData.invoice_reference)}` : ""} vid betalning.`,
+      }),
+      textContent: `Hej ${invoiceData.first_name}. Din prova-på-period är slut. Om du vill fortsätta träna är medlemsavgiften ${invoiceData.amount} kr med förfallodatum ${dueDate}. Om du inte vill fortsätta kan du ignorera detta mejl.`,
+      replyTo: DEFAULT_BRAND.contactEmail,
+    };
+  }
+
+  buildManualPaymentInfoEmail(userEmail, invoiceData) {
+    const dueDate = formatDate(invoiceData.due_date);
+
+    return {
+      to: userEmail,
+      subject: "Betaluppgifter för medlemskap",
+      htmlContent: createEmailShell({
+        eyebrow: DEFAULT_BRAND.name,
+        title: "Betaluppgifter för medlemskap",
+        intro: `Hej ${escapeHtml(invoiceData.first_name)}. Här kommer betaluppgifterna för ditt medlemskap hos oss.`,
+        sections: [
+          {
+            body: createMetaList([
+              { label: "Belopp", value: `${escapeHtml(String(invoiceData.amount))} kr` },
+              {
+                label: "Period",
+                value: `${escapeHtml(formatDate(invoiceData.membership_start))} till ${escapeHtml(formatDate(invoiceData.membership_end))}`,
+              },
+              { label: "Förfallodatum", value: escapeHtml(dueDate) },
+            ]),
+          },
+          {
+            heading: "Betalningsuppgifter",
+            body: createPaymentDetailsMarkup(),
+          },
+        ],
+        footnote: `Frågor? Kontakta oss på ${escapeHtml(DEFAULT_BRAND.contactEmail)}.`,
+      }),
+      textContent: `Hej ${invoiceData.first_name}. Här kommer betaluppgifterna för ditt medlemskap. Belopp: ${invoiceData.amount} kr. Förfallodatum: ${dueDate}.`,
+      replyTo: DEFAULT_BRAND.contactEmail,
+    };
+  }
+
   async sendEmail({ to, subject, htmlContent, textContent, replyTo }) {
     if (!isBrevoConfigured()) {
       return { success: false, skipped: true, error: "Brevo email service not configured" };
@@ -183,38 +394,7 @@ class EmailService {
   }
 
   async sendContactConfirmation(userEmail, payload) {
-    const subject = "Vi har tagit emot ditt meddelande";
-    const htmlContent = createEmailShell({
-      eyebrow: DEFAULT_BRAND.name,
-      title: "Tack för att du kontaktade oss",
-      intro: `Hej ${escapeHtml(payload.name)}. Vi har tagit emot ditt meddelande och återkommer så snart vi kan.`,
-      sections: [
-        {
-          kicker: "Bekräftelse",
-          heading: "Det här skickade du till oss",
-          body: `<p style="margin:0;">${normalizeMultilineText(payload.message)}</p>`,
-          background: "#fffdf7",
-        },
-        {
-          kicker: "Nästa steg",
-          heading: "Vi hör av oss personligen",
-          body: "<p style=\"margin:0;\">Om din fråga gäller träning, schema eller medlemskap återkommer vi med rätt information så snart som möjligt.</p>",
-        },
-      ],
-      cta: {
-        href: DEFAULT_BRAND.siteUrl,
-        label: "Besök hemsidan",
-      },
-      footnote: `Det här är en automatisk bekräftelse från ${DEFAULT_BRAND.name}. Du kan svara på detta mejl eller skriva till ${escapeHtml(DEFAULT_BRAND.contactEmail)} om du vill komplettera din fråga.`,
-    });
-
-    return this.sendEmail({
-      to: userEmail,
-      subject,
-      htmlContent,
-      textContent: `Hej ${payload.name}, vi har tagit emot ditt meddelande och återkommer så snart vi kan.`,
-      replyTo: DEFAULT_BRAND.contactEmail,
-    });
+    return this.sendEmail(this.buildContactConfirmationEmail(userEmail, payload));
   }
 
   async sendContactNotification(payload) {
@@ -222,32 +402,7 @@ class EmailService {
       return { success: false, skipped: true, error: "No contact email configured" };
     }
 
-    const subject = `Nytt kontaktmeddelande från ${payload.name}`;
-    const htmlContent = createEmailShell({
-      eyebrow: "Kontaktformulär",
-      title: "Nytt meddelande från hemsidan",
-      intro: "Ett nytt kontaktformulär har skickats in via webbplatsen.",
-      sections: [
-        {
-          heading: "Avsändare",
-          body: `<p style="margin:0 0 6px;"><strong>Namn:</strong> ${escapeHtml(payload.name)}</p><p style="margin:0;"><strong>E-post:</strong> ${escapeHtml(payload.email)}</p>`,
-          background: "#fffdf7",
-        },
-        {
-          heading: "Meddelande",
-          body: `<p style="margin:0;">${normalizeMultilineText(payload.message)}</p>`,
-        },
-      ],
-      footnote: "Det här mejlet skickades automatiskt från kontaktformuläret på hemsidan.",
-    });
-
-    return this.sendEmail({
-      to: DEFAULT_BRAND.contactEmail,
-      subject,
-      htmlContent,
-      textContent: `${payload.name} (${payload.email}) skrev: ${payload.message}`,
-      replyTo: payload.email,
-    });
+    return this.sendEmail(this.buildContactNotificationEmail(payload));
   }
 
   async sendAdminSignupAlert(payload) {
@@ -255,33 +410,7 @@ class EmailService {
       return { success: false, skipped: true, error: "No contact email configured" };
     }
 
-    const subject = `Ny anmälan: ${payload.first_name} ${payload.last_name}`;
-    const htmlContent = createEmailShell({
-      eyebrow: "Adminnotis",
-      title: "Ny registrering från hemsidan",
-      intro: "En ny medlem har registrerat sig via webbplatsen.",
-      sections: [
-        {
-          heading: "Medlemsuppgifter",
-          body: `
-            <p style="margin:0 0 6px;"><strong>Namn:</strong> ${escapeHtml(payload.first_name)} ${escapeHtml(payload.last_name)}</p>
-            <p style="margin:0 0 6px;"><strong>E-post:</strong> ${escapeHtml(payload.email)}</p>
-            <p style="margin:0 0 6px;"><strong>Telefon:</strong> ${escapeHtml(payload.phone || "-")}</p>
-            <p style="margin:0;"><strong>Prova-på till:</strong> ${formatDate(payload.trial_ends_at)}</p>
-          `,
-          background: "#fffdf7",
-        },
-      ],
-      footnote: "Den här adminnotisen skickades automatiskt efter en ny registrering.",
-    });
-
-    return this.sendEmail({
-      to: DEFAULT_BRAND.contactEmail,
-      subject,
-      htmlContent,
-      textContent: `Ny registrering: ${payload.first_name} ${payload.last_name}, ${payload.email}, prova-på till ${formatDate(payload.trial_ends_at)}.`,
-      replyTo: DEFAULT_BRAND.contactEmail,
-    });
+    return this.sendEmail(this.buildAdminSignupAlertEmail(payload));
   }
 
   async sendAdminInvoiceAlert(payload) {
@@ -289,141 +418,98 @@ class EmailService {
       return { success: false, skipped: true, error: "No contact email configured" };
     }
 
-    const subject = `Betalinfo skickad: ${payload.first_name} ${payload.last_name || ""}`.trim();
-    const htmlContent = createEmailShell({
-      eyebrow: "Adminnotis",
-      title: "Betaluppgifter har skickats",
-      intro: "En betalningspåminnelse eller faktura har skickats till en medlem.",
-      sections: [
-        {
-          heading: "Utskick",
-          body: `
-            <p style="margin:0 0 6px;"><strong>Mottagare:</strong> ${escapeHtml(payload.first_name)} ${escapeHtml(payload.last_name || "")}</p>
-            <p style="margin:0 0 6px;"><strong>E-post:</strong> ${escapeHtml(payload.email)}</p>
-            <p style="margin:0 0 6px;"><strong>Typ:</strong> ${escapeHtml(payload.trigger || "Automatiskt utskick")}</p>
-            <p style="margin:0;"><strong>Belopp:</strong> ${escapeHtml(String(payload.amount))} kr</p>
-          `,
-          background: "#fffdf7",
-        },
-      ],
-      footnote: "Den här adminnotisen skickades automatiskt när betaluppgifter mejlades ut.",
-    });
-
-    return this.sendEmail({
-      to: DEFAULT_BRAND.contactEmail,
-      subject,
-      htmlContent,
-      textContent: `Betaluppgifter skickade till ${payload.first_name} ${payload.last_name || ""} (${payload.email}). Typ: ${payload.trigger || "Automatiskt utskick"}.`,
-      replyTo: DEFAULT_BRAND.contactEmail,
-    });
+    return this.sendEmail(this.buildAdminInvoiceAlertEmail(payload));
   }
 
   async sendRegistrationConfirmation(userEmail, userData) {
-    const membershipStart = formatDate(userData.membership_start);
-    const membershipEnd = formatDate(userData.membership_end);
-    const trialEndDate = formatDate(userData.trial_ends_at || addDays(userData.membership_start, 14));
-    const subject = "Din anmälan till Nylöse SportCenter är mottagen";
-
-    const htmlContent = createEmailShell({
-      eyebrow: DEFAULT_BRAND.name,
-      title: "Välkommen till klubben",
-      intro: `Hej ${escapeHtml(userData.first_name)}. Din anmälan är mottagen och du är varmt välkommen att börja träna med oss.`,
-      sections: [
-        {
-          kicker: "Start",
-          heading: "Din plats är registrerad",
-          body: `<p style="margin:0 0 10px;">Medlemsperioden är upplagd från <strong>${membershipStart}</strong> till <strong>${membershipEnd}</strong>.</p><p style="margin:0;">Du har samtidigt <strong>2 veckors gratis prova-på</strong> till och med <strong>${trialEndDate}</strong>.</p>`,
-          background: "#fffdf7",
-        },
-        {
-          kicker: "Efter prova-på",
-          heading: "Så fungerar betalningen",
-          body: "<p style=\"margin:0 0 10px;\">Efter prova-på-perioden skickar vi betaluppgifterna automatiskt till dig.</p><p style=\"margin:0;\">Om du inte vill fortsätta efter dina två gratis veckor behöver du inte göra något alls. Det räcker att ignorera mejlet med betaluppgifterna.</p>",
-        },
-      ],
-      cta: {
-        href: DEFAULT_BRAND.siteUrl,
-        label: "Se hemsidan",
-      },
-      footnote: `Har du frågor innan dess är du alltid välkommen att kontakta oss på ${escapeHtml(DEFAULT_BRAND.contactEmail)}.`,
-    });
-
-    return this.sendEmail({
-      to: userEmail,
-      subject,
-      htmlContent,
-      textContent: `Hej ${userData.first_name}! Din anmälan är mottagen. Du har två veckors gratis prova-på till och med ${trialEndDate}. Efter det skickar vi betaluppgifter automatiskt. Om du inte vill fortsätta kan du ignorera det mejlet.`,
-      replyTo: DEFAULT_BRAND.contactEmail,
-    });
+    return this.sendEmail(this.buildRegistrationConfirmationEmail(userEmail, userData));
   }
 
   async sendTrialInvoice(userEmail, invoiceData) {
-    const subject = "Betaluppgifter för fortsatt medlemskap";
-    const dueDate = formatDate(invoiceData.due_date);
-    const htmlContent = createEmailShell({
-      eyebrow: "Medlemskap",
-      title: "Fortsätt träna med oss",
-      intro: `Hej ${escapeHtml(invoiceData.first_name)}. Din gratis prova-på-period är nu slut och här kommer betaluppgifterna om du vill fortsätta träna hos oss.`,
-      sections: [
-        {
-          kicker: "Avgift",
-          heading: "Fakturaöversikt",
-          body: `<p style="margin:0 0 6px;"><strong>Belopp:</strong> ${escapeHtml(String(invoiceData.amount))} kr</p><p style="margin:0 0 6px;"><strong>Avser period:</strong> ${formatDate(invoiceData.membership_start)} till ${formatDate(invoiceData.membership_end)}</p><p style="margin:0;"><strong>Förfallodatum:</strong> ${dueDate}</p>`,
-          background: "#fffdf7",
-        },
-        {
-          kicker: "Betaluppgifter",
-          heading: "Betala med något av följande",
-          body: createPaymentDetailsMarkup(),
-        },
-        {
-          kicker: "Viktigt",
-          heading: "Om du inte vill fortsätta",
-          body: "<p style=\"margin:0;\">Om du inte vill fortsätta efter prova-på-perioden behöver du inte göra någonting. Du kan enkelt ignorera detta mejl.</p>",
-        },
-      ],
-      footnote: `Ange gärna medlemsnamn${invoiceData.invoice_reference ? ` och referens <strong>${escapeHtml(invoiceData.invoice_reference)}</strong>` : ""} vid betalning så att vi kan matcha den snabbare.`,
-    });
-
-    return this.sendEmail({
-      to: userEmail,
-      subject,
-      htmlContent,
-      textContent: `Hej ${invoiceData.first_name}. Din prova-på-period är slut. Om du vill fortsätta träna är medlemsavgiften ${invoiceData.amount} kr med förfallodatum ${dueDate}. Om du inte vill fortsätta kan du ignorera detta mejl.`,
-      replyTo: DEFAULT_BRAND.contactEmail,
-    });
+    return this.sendEmail(this.buildTrialInvoiceEmail(userEmail, invoiceData));
   }
 
   async sendManualPaymentInfo(userEmail, invoiceData) {
-    const subject = "Betaluppgifter för medlemskap";
-    const dueDate = formatDate(invoiceData.due_date);
-    const htmlContent = createEmailShell({
-      eyebrow: "Medlemskap",
-      title: "Här kommer dina betaluppgifter",
-      intro: `Hej ${escapeHtml(invoiceData.first_name)}. Här kommer betaluppgifterna för ditt medlemskap hos oss.`,
-      sections: [
-        {
-          kicker: "Avgift",
-          heading: "Betalningsöversikt",
-          body: `<p style="margin:0 0 6px;"><strong>Belopp:</strong> ${escapeHtml(String(invoiceData.amount))} kr</p><p style="margin:0 0 6px;"><strong>Avser period:</strong> ${formatDate(invoiceData.membership_start)} till ${formatDate(invoiceData.membership_end)}</p><p style="margin:0;"><strong>Förfallodatum:</strong> ${dueDate}</p>`,
-          background: "#fffdf7",
-        },
-        {
-          kicker: "Betaluppgifter",
-          heading: "Betala med något av följande",
-          body: createPaymentDetailsMarkup(),
-        },
-      ],
-      footnote: `Kontakta oss gärna på ${escapeHtml(DEFAULT_BRAND.contactEmail)} om du har frågor om medlemskapet eller betalningen.`,
-    });
+    return this.sendEmail(this.buildManualPaymentInfoEmail(userEmail, invoiceData));
+  }
 
-    return this.sendEmail({
-      to: userEmail,
-      subject,
-      htmlContent,
-      textContent: `Hej ${invoiceData.first_name}. Här kommer betaluppgifterna för ditt medlemskap. Belopp: ${invoiceData.amount} kr. Förfallodatum: ${dueDate}.`,
-      replyTo: DEFAULT_BRAND.contactEmail,
-    });
+  getPreviewTemplates() {
+    const previewData = {
+      contact: {
+        name: "Sara Andersson",
+        email: "sara.andersson@example.com",
+        message:
+          "Hej! Jag vill veta vilken grupp som passar bäst för en nybörjare på 12 år och vilka tider som gäller just nu.",
+      },
+      member: {
+        first_name: "Ali",
+        last_name: "Hassan",
+        email: "ali.hassan@example.com",
+        phone: "070-123 45 67",
+      },
+      membership: {
+        membership_start: "2026-04-07",
+        membership_end: "2026-07-07",
+        trial_ends_at: "2026-04-21T10:00:00.000Z",
+        due_date: "2026-04-30T10:00:00.000Z",
+        amount: 600,
+        invoice_reference: "NSC-4242",
+      },
+    };
+
+    return [
+      {
+        slug: "contact-confirmation",
+        label: "Kontaktbekräftelse",
+        ...this.buildContactConfirmationEmail(previewData.contact.email, previewData.contact),
+      },
+      {
+        slug: "contact-notification-admin",
+        label: "Kontakt till admin",
+        ...this.buildContactNotificationEmail(previewData.contact),
+      },
+      {
+        slug: "signup-confirmation-member",
+        label: "Anmälningsbekräftelse",
+        ...this.buildRegistrationConfirmationEmail(previewData.member.email, {
+          ...previewData.member,
+          ...previewData.membership,
+        }),
+      },
+      {
+        slug: "signup-alert-admin",
+        label: "Ny anmälan till admin",
+        ...this.buildAdminSignupAlertEmail({
+          ...previewData.member,
+          trial_ends_at: previewData.membership.trial_ends_at,
+        }),
+      },
+      {
+        slug: "trial-ending-invoice-member",
+        label: "Automatisk betalinfo",
+        ...this.buildTrialInvoiceEmail(previewData.member.email, {
+          ...previewData.member,
+          ...previewData.membership,
+        }),
+      },
+      {
+        slug: "invoice-alert-admin",
+        label: "Betalinfo till admin",
+        ...this.buildAdminInvoiceAlertEmail({
+          ...previewData.member,
+          amount: previewData.membership.amount,
+          trigger: "Automatisk efter prova-på",
+        }),
+      },
+      {
+        slug: "manual-payment-member",
+        label: "Manuell betalinfo",
+        ...this.buildManualPaymentInfoEmail(previewData.member.email, {
+          ...previewData.member,
+          ...previewData.membership,
+        }),
+      },
+    ];
   }
 
   async processPendingTrialInvoices(db) {
