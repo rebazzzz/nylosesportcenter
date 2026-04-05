@@ -2,12 +2,15 @@ const DEFAULT_BRAND = {
   name: "Nylöse SportCenter",
   siteUrl: process.env.PUBLIC_APP_URL || process.env.FRONTEND_URL || "http://localhost:3001",
   contactEmail: process.env.EMAIL_REPLY_TO || "nylosesportcenter@gmail.com",
-  primary: "#102a43",
-  dark: "#111111",
+  primary: "#0069bb",
+  cta: "#e64522",
+  badge: "#f4ed15",
+  cream: "#f5f5f0",
+  dark: "#101820",
   light: "#ffffff",
-  muted: "#f4f4f1",
-  body: "#25313d",
-  border: "#dde3e8",
+  muted: "#f7fbff",
+  body: "#17324d",
+  border: "rgba(16, 24, 32, 0.12)",
 };
 
 let invoiceScheduler = null;
@@ -84,7 +87,7 @@ function createEmailShell({ eyebrow, title, intro, sections = [], cta, footnote 
     ? `
       <tr>
         <td style="padding:0 36px 28px;">
-          <a href="${escapeHtml(cta.href)}" style="display:inline-block;background:${DEFAULT_BRAND.primary};color:${DEFAULT_BRAND.light};text-decoration:none;padding:14px 22px;border-radius:999px;font-size:15px;font-weight:700;">${cta.label}</a>
+          <a href="${escapeHtml(cta.href)}" style="display:inline-block;background:${DEFAULT_BRAND.cta};color:${DEFAULT_BRAND.light};text-decoration:none;padding:14px 22px;border-radius:999px;font-size:15px;font-weight:700;">${cta.label}</a>
         </td>
       </tr>`
     : "";
@@ -97,8 +100,8 @@ function createEmailShell({ eyebrow, title, intro, sections = [], cta, footnote 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${escapeHtml(title)}</title>
       </head>
-      <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,sans-serif;color:${DEFAULT_BRAND.body};">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6f8;padding:24px 12px;">
+      <body style="margin:0;padding:0;background:${DEFAULT_BRAND.cream};font-family:Arial,sans-serif;color:${DEFAULT_BRAND.body};">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${DEFAULT_BRAND.cream};padding:24px 12px;">
           <tr>
             <td align="center">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:${DEFAULT_BRAND.light};border-radius:18px;overflow:hidden;border:1px solid ${DEFAULT_BRAND.border};">
@@ -107,7 +110,7 @@ function createEmailShell({ eyebrow, title, intro, sections = [], cta, footnote 
                 </tr>
                 <tr>
                   <td style="padding:34px 36px 26px;">
-                    <p style="margin:0 0 10px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#5f6974;font-weight:700;">${escapeHtml(eyebrow)}</p>
+                    <p style="display:inline-block;margin:0 0 14px;padding:6px 10px;border-radius:999px;background:${DEFAULT_BRAND.badge};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:${DEFAULT_BRAND.dark};font-weight:700;">${escapeHtml(eyebrow)}</p>
                     <h1 style="margin:0 0 14px;font-size:30px;line-height:1.18;color:${DEFAULT_BRAND.dark};">${escapeHtml(title)}</h1>
                     <p style="margin:0;font-size:16px;line-height:1.75;color:${DEFAULT_BRAND.body};">${intro}</p>
                   </td>
