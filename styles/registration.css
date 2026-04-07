@@ -1,7 +1,7 @@
 .registration {
   background: var(--bg-light-blue);
   min-height: calc(100vh - 200px);
-  padding: 4rem 0;
+  padding: 2rem 0 4rem;
 }
 
 .registration-note {

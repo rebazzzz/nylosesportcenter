@@ -52,7 +52,7 @@
 
 @media (max-width: 768px) {
   :root {
-    --sticky-nav-offset: 90px;
+    --sticky-nav-offset: 78px;
   }
 
   .nav-container {
