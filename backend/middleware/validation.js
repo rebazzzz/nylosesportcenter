@@ -14,6 +14,15 @@ const swedishDays = [
   "Söndag",
 ];
 
+function getMinimumPersonnummerYear() {
+  return new Date().getFullYear() - 120;
+}
+
+function isAllowedBirthYear(year) {
+  const currentYear = new Date().getFullYear();
+  return Number.isInteger(year) && year >= getMinimumPersonnummerYear() && year <= currentYear;
+}
+
 function parseBirthDateFromPersonnummer(personnummer) {
   if (!personnummerRegex.test(personnummer)) return null;
 
@@ -21,6 +30,11 @@ function parseBirthDateFromPersonnummer(personnummer) {
   const year = Number(birthPart.slice(0, 4));
   const month = Number(birthPart.slice(4, 6));
   const day = Number(birthPart.slice(6, 8));
+
+  if (!isAllowedBirthYear(year)) {
+    return null;
+  }
+
   const birthDate = new Date(year, month - 1, day);
 
   if (

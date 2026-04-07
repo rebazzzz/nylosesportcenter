@@ -21,7 +21,7 @@ router.use((req, res, next) => {
 
 const registerLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 8,
+  max: process.env.NODE_ENV === "production" ? 8 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "För många registreringsförsök. Försök igen senare." },
@@ -29,7 +29,7 @@ const registerLimiter = rateLimit({
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: process.env.NODE_ENV === "production" ? 10 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "För många inloggningsförsök. Försök igen senare." },

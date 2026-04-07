@@ -153,6 +153,22 @@ test("registration rejects personnummer with an impossible birth date", async ()
   assert.match(response.body.error, /giltigt datum/i);
 });
 
+test("registration rejects personnummer with an invalid birth year", async () => {
+  const app = createApp();
+
+  const response = await request(app).post("/api/auth/register").send({
+    email: "invalid-year@test.local",
+    first_name: "Invalid",
+    last_name: "Year",
+    personnummer: "00000101-1234",
+    phone: "0701113344",
+    address: "Year Street 2",
+  });
+
+  assert.equal(response.status, 400);
+  assert.match(response.body.error, /giltigt datum/i);
+});
+
 test("contact form submission is stored and visible to admin", async () => {
   const app = createApp();
 

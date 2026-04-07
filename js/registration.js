@@ -13,6 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const parentFields = document.querySelectorAll(".parent-field");
   const registerBtn = document.getElementById("register-btn");
   const registrationForm = document.querySelector(".registration-form");
+  const MIN_PERSONNUMMER_YEAR = new Date().getFullYear() - 120;
+
+  function isAllowedBirthYear(year) {
+    const currentYear = new Date().getFullYear();
+    return Number.isInteger(year) && year >= MIN_PERSONNUMMER_YEAR && year <= currentYear;
+  }
 
   function parseBirthDateFromPersonnummer(personnummer) {
     const digits = personnummer.replace(/[^0-9]/g, "");
@@ -21,6 +27,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const year = Number(digits.slice(0, 4));
     const month = Number(digits.slice(4, 6));
     const day = Number(digits.slice(6, 8));
+
+    if (!isAllowedBirthYear(year)) {
+      return null;
+    }
+
     const birthDate = new Date(year, month - 1, day);
 
     if (
