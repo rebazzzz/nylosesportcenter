@@ -59,7 +59,6 @@ router.get("/profile", async (req, res) => {
         last_name: user.last_name,
         phone: user.phone,
         address: user.address,
-        personnummer: user.personnummer,
         role: user.role,
         created_at: user.created_at,
       },
@@ -68,7 +67,7 @@ router.get("/profile", async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching member profile:", error);
-    res.status(500).json({ error: "Failed to fetch profile" });
+    res.status(500).json({ error: "Profilen kunde inte hÃ¤mtas" });
   }
 });
 
@@ -116,7 +115,7 @@ router.post("/membership/renew", async (req, res) => {
     );
 
     res.status(201).json({
-      message: "Membership renewal initiated",
+      message: "Medlemskapet har fÃ¶rnyats",
       membership: {
         id: membershipResult.id,
         start_date: startDate.toISOString().split("T")[0],
@@ -128,7 +127,7 @@ router.post("/membership/renew", async (req, res) => {
     });
   } catch (error) {
     console.error("Error renewing membership:", error);
-    res.status(500).json({ error: "Failed to renew membership" });
+    res.status(500).json({ error: "Medlemskapet kunde inte fÃ¶rnyas" });
   }
 });
 
@@ -151,7 +150,7 @@ router.get("/payments", async (req, res) => {
     res.json(payments);
   } catch (error) {
     console.error("Error fetching payment history:", error);
-    res.status(500).json({ error: "Failed to fetch payment history" });
+    res.status(500).json({ error: "Betalningshistoriken kunde inte hÃ¤mtas" });
   }
 });
 
@@ -170,7 +169,7 @@ router.put("/profile", validateBody(memberProfileUpdateSchema), async (req, res)
 
     const updatedUser = await db.getUserById(userId);
     res.json({
-      message: "Profile updated successfully",
+      message: "Profilen har uppdaterats",
       user: {
         id: updatedUser.id,
         email: updatedUser.email,
@@ -183,7 +182,7 @@ router.put("/profile", validateBody(memberProfileUpdateSchema), async (req, res)
     });
   } catch (error) {
     console.error("Error updating profile:", error);
-    res.status(500).json({ error: "Failed to update profile" });
+    res.status(500).json({ error: "Profilen kunde inte uppdateras" });
   }
 });
 
@@ -225,7 +224,7 @@ router.get("/membership/status", async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching membership status:", error);
-    res.status(500).json({ error: "Failed to fetch membership status" });
+    res.status(500).json({ error: "Medlemsstatus kunde inte hÃ¤mtas" });
   }
 });
 

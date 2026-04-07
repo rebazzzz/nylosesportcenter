@@ -7,34 +7,34 @@ const authenticateToken = async (req, res, next) => {
   const token = bearerToken || req.cookies?.auth_token;
 
   if (!token) {
-    return res.status(401).json({ error: "Access token required" });
+    return res.status(401).json({ error: "Inloggning krÃ¤vs" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await db.getUserById(decoded.userId);
+    const user = await db.getAuthUserById(decoded.userId);
 
     if (!user || !user.is_active) {
-      return res.status(401).json({ error: "Invalid or inactive user" });
+      return res.status(401).json({ error: "Ogiltig eller inaktiv anvÃ¤ndare" });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({ error: "Invalid or expired token" });
+    return res.status(401).json({ error: "Ogiltig eller utgÃ¥ngen inloggning" });
   }
 };
 
 const requireAdmin = (req, res, next) => {
   if (req.user.role !== "admin") {
-    return res.status(403).json({ error: "Admin access required" });
+    return res.status(403).json({ error: "AdministratÃ¶rsbehÃ¶righet krÃ¤vs" });
   }
   next();
 };
 
 const requireMember = (req, res, next) => {
   if (req.user.role !== "member") {
-    return res.status(403).json({ error: "Member access required" });
+    return res.status(403).json({ error: "MedlemsbehÃ¶righet krÃ¤vs" });
   }
   next();
 };

@@ -14,8 +14,8 @@ const swedishDays = [
   "Söndag",
 ];
 
-function isMinorFromPersonnummer(personnummer) {
-  if (!personnummerRegex.test(personnummer)) return false;
+function parseBirthDateFromPersonnummer(personnummer) {
+  if (!personnummerRegex.test(personnummer)) return null;
 
   const [birthPart] = personnummer.split("-");
   const year = Number(birthPart.slice(0, 4));
@@ -29,11 +29,18 @@ function isMinorFromPersonnummer(personnummer) {
     birthDate.getMonth() !== month - 1 ||
     birthDate.getDate() !== day
   ) {
-    return false;
+    return null;
   }
 
   birthDate.setHours(0, 0, 0, 0);
-  const today = new Date();
+  return birthDate;
+}
+
+function calculateAgeFromPersonnummer(personnummer, referenceDate = new Date()) {
+  const birthDate = parseBirthDateFromPersonnummer(personnummer);
+  if (!birthDate) return null;
+
+  const today = new Date(referenceDate);
   today.setHours(0, 0, 0, 0);
 
   let age = today.getFullYear() - birthDate.getFullYear();
@@ -43,7 +50,23 @@ function isMinorFromPersonnummer(personnummer) {
     age -= 1;
   }
 
+  return age;
+}
+
+function isMinorFromPersonnummer(personnummer) {
+  const age = calculateAgeFromPersonnummer(personnummer);
+  if (age === null) return false;
+
   return age < 18;
+}
+
+function isFutureBirthDate(personnummer) {
+  const birthDate = parseBirthDateFromPersonnummer(personnummer);
+  if (!birthDate) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return birthDate > today;
 }
 
 const registerSchema = z
@@ -61,6 +84,24 @@ const registerSchema = z
     website: z.string().trim().max(0, "Ogiltig förfrågan").optional().or(z.literal("")),
   })
   .superRefine((data, ctx) => {
+    if (!parseBirthDateFromPersonnummer(data.personnummer)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Ange ett giltigt datum i personnumret",
+        path: ["personnummer"],
+      });
+      return;
+    }
+
+    if (isFutureBirthDate(data.personnummer)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Personnumret kan inte innehÃ¥lla ett framtida fÃ¶delsedatum",
+        path: ["personnummer"],
+      });
+      return;
+    }
+
     if (isMinorFromPersonnummer(data.personnummer)) {
       if (!data.parent_name || !data.parent_lastname || !data.parent_phone) {
         ctx.addIssue({

@@ -355,6 +355,20 @@ class Database {
     };
   }
 
+  mapAuthUser(user) {
+    if (!user) return null;
+
+    return {
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      role: user.role,
+      is_active: user.is_active,
+      created_at: user.created_at,
+    };
+  }
+
   async createMember(member) {
     return this.runQuery(
       `INSERT INTO users (
@@ -537,6 +551,17 @@ class Database {
     );
 
     return this.mapUser(user);
+  }
+
+  async getAuthUserById(id) {
+    const user = await this.getQuery(
+      `SELECT id, email, first_name, last_name, role, is_active, created_at
+       FROM users
+       WHERE id = ?`,
+      [id],
+    );
+
+    return this.mapAuthUser(user);
   }
 
   close() {

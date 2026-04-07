@@ -137,6 +137,22 @@ test("registration still requires parent details until the 18th birthday has pas
   assert.match(response.body.error, /V.+rdnadshavares namn och telefon/i);
 });
 
+test("registration rejects personnummer with an impossible birth date", async () => {
+  const app = createApp();
+
+  const response = await request(app).post("/api/auth/register").send({
+    email: "invalid-date@test.local",
+    first_name: "Invalid",
+    last_name: "Date",
+    personnummer: "20124545-1234",
+    phone: "0701239876",
+    address: "Date Street 1",
+  });
+
+  assert.equal(response.status, 400);
+  assert.match(response.body.error, /giltigt datum/i);
+});
+
 test("contact form submission is stored and visible to admin", async () => {
   const app = createApp();
 
@@ -206,6 +222,70 @@ test("member profile updates keep sensitive fields encrypted at rest", async () 
   assert.match(rawUser.address, /^enc:v1:/);
   assert.notEqual(rawUser.phone, "0709998888");
   assert.notEqual(rawUser.address, "New Street 2");
+});
+
+test("member profile does not expose personnummer in API responses", async () => {
+  const app = createApp();
+
+  const registerResponse = await request(app).post("/api/auth/register").send({
+    email: "member-profile@test.local",
+    first_name: "Profile",
+    last_name: "Member",
+    personnummer: "20010101-1234",
+    phone: "0705556677",
+    address: "Profile Street 4",
+  });
+
+  assert.equal(registerResponse.status, 201);
+
+  const member = await db.getUserByEmail("member-profile@test.local");
+  const token = jwt.sign(
+    { userId: member.id, email: member.email, role: "member" },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" },
+  );
+
+  const profileResponse = await request(app)
+    .get("/api/member/profile")
+    .set("Authorization", `Bearer ${token}`);
+
+  assert.equal(profileResponse.status, 200);
+  assert.equal(profileResponse.body.user.email, "member-profile@test.local");
+  assert.equal("personnummer" in profileResponse.body.user, false);
+});
+
+test("admin member list still returns decrypted personnummer only for authenticated admins", async () => {
+  const app = createApp();
+
+  const registerResponse = await request(app).post("/api/auth/register").send({
+    email: "admin-view@test.local",
+    first_name: "Admin",
+    last_name: "Visible",
+    personnummer: "19950101-1234",
+    phone: "0707778899",
+    address: "Admin Street 9",
+  });
+
+  assert.equal(registerResponse.status, 201);
+
+  const unauthorizedResponse = await request(app).get("/api/admin/members");
+  assert.equal(unauthorizedResponse.status, 401);
+  assert.match(unauthorizedResponse.body.error, /Inloggning kr.+vs/i);
+
+  const loginResponse = await request(app).post("/api/auth/login").send({
+    email: "admin@test.local",
+    password: "VeryStrongTestPassword123!",
+  });
+
+  const authorizedResponse = await request(app)
+    .get("/api/admin/members")
+    .set("Cookie", loginResponse.headers["set-cookie"]);
+
+  assert.equal(authorizedResponse.status, 200);
+  assert.equal(
+    authorizedResponse.body.some((memberRecord) => memberRecord.personnummer === "19950101-1234"),
+    true,
+  );
 });
 
 test("admin can manually send payment info to a specific member email", async () => {

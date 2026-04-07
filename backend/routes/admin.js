@@ -37,7 +37,7 @@ router.get("/statistics", async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching statistics:", error);
-    res.status(500).json({ error: "Failed to fetch statistics" });
+    res.status(500).json({ error: "Statistiken kunde inte hÃ¤mtas" });
   }
 });
 
@@ -47,7 +47,7 @@ router.get("/members", async (req, res) => {
     res.json(members);
   } catch (error) {
     console.error("Error fetching members:", error);
-    res.status(500).json({ error: "Failed to fetch members" });
+    res.status(500).json({ error: "Medlemmarna kunde inte hÃ¤mtas" });
   }
 });
 
@@ -57,7 +57,7 @@ router.get("/contact-submissions", async (req, res) => {
     res.json(submissions);
   } catch (error) {
     console.error("Error fetching contact submissions:", error);
-    res.status(500).json({ error: "Failed to fetch contact submissions" });
+    res.status(500).json({ error: "Kontaktmeddelandena kunde inte hÃ¤mtas" });
   }
 });
 

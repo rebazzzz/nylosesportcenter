@@ -52,6 +52,59 @@ document.addEventListener("DOMContentLoaded", () => {
     return age;
   }
 
+  function formatPersonnummerDigits(digits) {
+    const normalizedDigits = digits.replace(/[^0-9]/g, "").slice(0, 12);
+    if (normalizedDigits.length <= 8) {
+      return normalizedDigits;
+    }
+
+    return `${normalizedDigits.slice(0, 8)}-${normalizedDigits.slice(8)}`;
+  }
+
+  function countDigitsBeforeCaret(value, caretPosition) {
+    return value.slice(0, caretPosition).replace(/[^0-9]/g, "").length;
+  }
+
+  function getCaretPositionFromDigitIndex(formattedValue, digitIndex) {
+    if (digitIndex <= 0) return 0;
+
+    let digitsSeen = 0;
+    for (let index = 0; index < formattedValue.length; index += 1) {
+      if (/\d/.test(formattedValue[index])) {
+        digitsSeen += 1;
+      }
+
+      if (digitsSeen >= digitIndex) {
+        return index + 1;
+      }
+    }
+
+    return formattedValue.length;
+  }
+
+  function updatePersonnummerState(value, caretDigitIndex = null) {
+    if (!personnummerInput) return;
+
+    const formattedValue = formatPersonnummerDigits(value);
+    personnummerInput.value = formattedValue;
+
+    if (typeof caretDigitIndex === "number") {
+      const nextCaretPosition = getCaretPositionFromDigitIndex(formattedValue, caretDigitIndex);
+      personnummerInput.setSelectionRange(nextCaretPosition, nextCaretPosition);
+    }
+
+    const birthDate = parseBirthDateFromPersonnummer(formattedValue);
+    const age = birthDate ? calculateAgeFromPersonnummer(formattedValue) : null;
+
+    if (formattedValue.length === 13 && !birthDate) {
+      personnummerInput.setCustomValidity("Ange ett giltigt datum i personnumret.");
+    } else {
+      personnummerInput.setCustomValidity("");
+    }
+
+    toggleParentFields(age !== null && age < 18);
+  }
+
   function toggleParentFields(isVisible) {
     parentFields.forEach((field) => {
       field.style.display = isVisible ? "flex" : "none";
@@ -70,23 +123,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (personnummerInput) {
+    personnummerInput.setAttribute("inputmode", "numeric");
+    personnummerInput.setAttribute("autocomplete", "off");
+
+    personnummerInput.addEventListener("keydown", (event) => {
+      const { selectionStart, selectionEnd, value } = event.target;
+
+      if (
+        selectionStart === null ||
+        selectionEnd === null ||
+        selectionStart !== selectionEnd
+      ) {
+        return;
+      }
+
+      if (event.key === "Backspace" && value[selectionStart - 1] === "-") {
+        event.preventDefault();
+
+        const digits = value.replace(/[^0-9]/g, "");
+        const digitIndex = countDigitsBeforeCaret(value, selectionStart);
+        if (digitIndex <= 0) {
+          return;
+        }
+
+        const updatedDigits =
+          digits.slice(0, digitIndex - 1) + digits.slice(digitIndex);
+        updatePersonnummerState(updatedDigits, digitIndex - 1);
+      }
+
+      if (event.key === "Delete" && value[selectionStart] === "-") {
+        event.preventDefault();
+
+        const digits = value.replace(/[^0-9]/g, "");
+        const digitIndex = countDigitsBeforeCaret(value, selectionStart);
+        if (digitIndex >= digits.length) {
+          return;
+        }
+
+        const updatedDigits =
+          digits.slice(0, digitIndex) + digits.slice(digitIndex + 1);
+        updatePersonnummerState(updatedDigits, digitIndex);
+      }
+    });
+
     personnummerInput.addEventListener("input", (event) => {
-      let value = event.target.value.replace(/[^0-9]/g, "");
-      if (value.length > 12) {
-        value = value.slice(0, 12);
-      }
-
-      if (value.length >= 8) {
-        value = `${value.slice(0, 8)}-${value.slice(8)}`;
-      }
-
-      event.target.value = value;
-      const age = calculateAgeFromPersonnummer(value);
-      toggleParentFields(age !== null && age < 18);
+      const rawValue = event.target.value;
+      const selectionStart = event.target.selectionStart ?? rawValue.length;
+      const digitIndex = countDigitsBeforeCaret(rawValue, selectionStart);
+      updatePersonnummerState(rawValue, digitIndex);
     });
   }
 
-  toggleParentFields(false);
+  updatePersonnummerState(personnummerInput?.value || "");
 
   if (registrationForm && registerBtn) {
     registrationForm.addEventListener("submit", async (event) => {
@@ -98,6 +186,13 @@ document.addEventListener("DOMContentLoaded", () => {
         "",
       );
       const age = calculateAgeFromPersonnummer(personnummer);
+
+      if (personnummer && age === null) {
+        personnummerInput?.setCustomValidity("Ange ett giltigt datum i personnumret.");
+        personnummerInput?.reportValidity();
+        return;
+      }
+
       const isMinor = age !== null && age < 18;
 
       const registrationData = {

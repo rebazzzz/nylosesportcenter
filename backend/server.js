@@ -123,10 +123,13 @@ function createApp() {
   app.use(
     cors({
       origin(origin, callback) {
-        if (!origin || origin === "null" || allowedOrigins.includes(origin)) {
+        const allowNullOrigin =
+          process.env.NODE_ENV !== "production" && (!origin || origin === "null");
+
+        if (allowNullOrigin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
-          callback(new Error("Not allowed by CORS"));
+          callback(new Error("OtillÃ¥ten CORS-begÃ¤ran"));
         }
       },
       credentials: true,
@@ -217,16 +220,16 @@ function createApp() {
   app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
-      error: "Something went wrong!",
+      error: "NÃ¥got gick fel",
       message:
         process.env.NODE_ENV === "development"
           ? err.message
-          : "Internal server error",
+          : "Internt serverfel",
     });
   });
 
   app.use((req, res) => {
-    res.status(404).json({ error: "Route not found" });
+    res.status(404).json({ error: "Sidan eller resursen hittades inte" });
   });
 
   return app;
